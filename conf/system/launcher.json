@@ -1,0 +1,9 @@
+{
+  "version":"1.0-SNAPSHOT 11th November",
+  "blocks": {
+    "default": [
+      "com.codingchili.services.Router.Service",
+      "com.codingchili.highscore.Service"
+    ]
+  }
+}

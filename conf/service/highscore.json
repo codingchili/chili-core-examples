@@ -1,0 +1,7 @@
+{
+  "identity": {
+    "host": "server.1",
+    "node": "highscore.node"
+  },
+  "maxCount": 3
+}

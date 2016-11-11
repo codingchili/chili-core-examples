@@ -1,0 +1,24 @@
+{
+  "identity": {
+    "node": "routing.node",
+    "host": "server.1"
+  },
+  "transport": [
+    {
+      "api": {
+        "/highscore": {
+          "target": "highscore.node",
+          "action": "list"
+        },
+        "/update": {
+          "target": "highscore.node",
+          "action": "update"
+        }
+      },
+      "type": "REST",
+      "port": 80,
+      "timeout": 8000,
+      "maxRequestBytes": 512
+    }
+  ]
+}
