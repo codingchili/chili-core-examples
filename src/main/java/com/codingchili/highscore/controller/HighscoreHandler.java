@@ -3,6 +3,8 @@ package com.codingchili.highscore.controller;
 import com.codingchili.highscore.context.HighscoreContext;
 import com.codingchili.highscore.model.Constants;
 import com.codingchili.highscore.model.HighscoreEntry;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +15,19 @@ import com.codingchili.core.listener.Request;
 import com.codingchili.core.protocol.*;
 
 import static com.codingchili.core.protocol.RoleMap.PUBLIC;
+import static com.codingchili.highscore.model.Constants.ID_LIST;
 
 /**
- * Handler class that is used by the ClusterListener to handle incoming messages.
- * Handlers are registered to cluster-wide addresses.
+ * Handler class that is used by the listener to handle incoming messages.
+ * The type of the listener can be HTTP/REST, UDP, TCP, WEBSOCKET or CLUSTER.
+ *
+ * Roles annotation may be placed on the handler or on individual services,
+ * the annotation is processed by the protocol. The protocol will then
+ * proceed to compare the Role specified to the role returned by the
+ * pluggable authorization implementation.
+ *
+ * The address annotation indicates where the handler is listening. It is
+ * picked up by the listener to route requests to the correct handler.
  */
 @Roles(PUBLIC)
 @Address(Constants.HIGHSCORE_NODE)
@@ -26,14 +37,14 @@ public class HighscoreHandler implements CoreHandler {
     private HighscoreContext context;
 
     public HighscoreHandler(HighscoreContext context) {
+        // call 'annotated' so the protocol processes the annotations for this API.
+        // we can still use protocol.use('name', handler); if we want to.
         protocol.annotated(this);
         this.context = context;
     }
 
     /**
-     * Handler method for the update action, called with a raw request object.
-     * When using raw requests manual serialization is needed, it is recommended
-     * to extend the request class and provide helper methods for serialization.
+     * This update method is called for requests to /api/update.
      */
     @Api
     public void update(HighscoreRequest request) {
@@ -49,11 +60,17 @@ public class HighscoreHandler implements CoreHandler {
     }
 
     /**
-     * Handler method to list all the current highscore entries on the server.
+     * This method to list highscores is called for requests to /api/list
      */
     @Api
     public void list(HighscoreRequest request) {
-        request.sendHighscore(highscore);
+        request.write(new JsonObject().put(ID_LIST, toJsonArray(highscore)));
+    }
+
+    private JsonArray toJsonArray(List<HighscoreEntry> list) {
+        JsonArray array = new JsonArray();
+        list.forEach(entry -> array.add(Serializer.json(entry)));
+        return array;
     }
 
     /**

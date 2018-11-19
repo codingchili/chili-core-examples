@@ -3,7 +3,6 @@ package com.codingchili.highscore.controller;
 import com.codingchili.highscore.context.HighscoreContextMock;
 import com.codingchili.highscore.model.Constants;
 import com.codingchili.highscore.model.HighscoreEntry;
-import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
@@ -22,7 +21,8 @@ import static com.codingchili.highscore.model.Constants.*;
 /**
  * @author Robin Duda
  *
- * Sample test for a handler.
+ * Sample test for a handler, as handlers are decoupled from the underlying
+ * transports its very easy to write unit tests for them.
  */
 @RunWith(VertxUnitRunner.class)
 public class HighscoreHandlerTest {
