@@ -1,10 +1,9 @@
 package com.codingchili.highscore.context;
 
-import io.vertx.core.Vertx;
-
-import com.codingchili.core.Configuration.Strings;
-import com.codingchili.core.Context.ServiceContext;
-import com.codingchili.core.Files.Configurations;
+import com.codingchili.core.configuration.CoreStrings;
+import com.codingchili.core.context.CoreContext;
+import com.codingchili.core.context.SystemContext;
+import com.codingchili.core.files.Configurations;
 
 
 /**
@@ -12,20 +11,14 @@ import com.codingchili.core.Files.Configurations;
  * recommended to leave service() protected and instead provide helper methods to
  * avoid the result of Configurations.get being cached.
  */
-public class HighscoreContext extends ServiceContext {
+public class HighscoreContext extends SystemContext {
     private static final String STATS = "highscore";
 
-    public HighscoreContext(Vertx vertx) {
-        super(vertx);
+    public HighscoreContext(CoreContext core) {
+        super(core);
     }
 
-    @Override
-    protected HighscoreSettings service() {
-        return Configurations.get(Strings.getService(STATS),
-                HighscoreSettings.class);
-    }
-
-    public Integer maxCount() {
-        return service().maxCount;
+    public HighscoreSettings settings() {
+        return Configurations.get(CoreStrings.getService(STATS), HighscoreSettings.class);
     }
 }

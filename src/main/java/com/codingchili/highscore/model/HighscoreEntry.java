@@ -24,4 +24,14 @@ public class HighscoreEntry {
     public void setScore(Integer score) {
         this.score = score;
     }
+
+    @Override
+    public int hashCode() {
+        return player.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof HighscoreEntry && ((HighscoreEntry) obj).player.equals(player));
+    }
 }

@@ -6,7 +6,9 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.List;
 
-import com.codingchili.core.Protocol.*;
+import com.codingchili.core.listener.Request;
+import com.codingchili.core.listener.RequestWrapper;
+import com.codingchili.core.protocol.Serializer;
 
 import static com.codingchili.highscore.model.Constants.ID_LIST;
 
@@ -15,9 +17,11 @@ import static com.codingchili.highscore.model.Constants.ID_LIST;
  *
  * A request class extending a ClusterRequest to encapsulate serialization logic.
  */
-class HighscoreRequest extends ClusterRequest {
+public class HighscoreRequest implements RequestWrapper {
+    private Request request;
+
     HighscoreRequest(Request request) {
-        super(request);
+        this.request = request;
     }
 
     void sendHighscore(List<HighscoreEntry> highscore) {
@@ -26,7 +30,12 @@ class HighscoreRequest extends ClusterRequest {
 
     private JsonArray toJsonArray(List<HighscoreEntry> list) {
         JsonArray array = new JsonArray();
-        list.stream().forEach(entry -> array.add(Serializer.json(entry)));
+        list.forEach(entry -> array.add(Serializer.json(entry)));
         return array;
+    }
+
+    @Override
+    public Request request() {
+        return request;
     }
 }

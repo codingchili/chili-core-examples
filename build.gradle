@@ -1,0 +1,47 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+
+project.version = "1.0.39"
+project.group = 'com.codingchili.chili-samples'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.github.codingchili.chili-core:core:1.0.39'
+    testCompile 'io.vertx:vertx-unit:3.5.1'
+    testCompile 'junit:junit:4.12'
+}
+
+test {
+    testLogging {
+        exceptionFormat "full"
+    }
+    reports.html.enabled = false
+}
+
+jar {
+    zip64 true
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes 'Implementation-Title': 'chili-samples-highscore',
+                'Implementation-Version': version,
+                'Main-Class': 'com.codingchili.highscore.Service'
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.DSA', 'META-INF/*.SF'
+}

@@ -1,24 +1,21 @@
 package com.codingchili.highscore.controller;
 
-import com.codingchili.highscore.context.ContextMock;
+import com.codingchili.highscore.context.HighscoreContextMock;
 import com.codingchili.highscore.model.Constants;
 import com.codingchili.highscore.model.HighscoreEntry;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.codingchili.core.Exception.CoreException;
-import com.codingchili.core.Protocol.ResponseStatus;
-import com.codingchili.core.Protocol.Serializer;
-import com.codingchili.core.Testing.RequestMock;
-import com.codingchili.core.Testing.ResponseListener;
+import com.codingchili.core.protocol.ResponseStatus;
+import com.codingchili.core.protocol.Serializer;
+import com.codingchili.core.testing.*;
 
 import static com.codingchili.highscore.model.Constants.*;
 
@@ -31,17 +28,22 @@ import static com.codingchili.highscore.model.Constants.*;
 public class HighscoreHandlerTest {
     private static final String PLAYER_NAME = "player";
     private HighscoreHandler handler;
-    private ContextMock context;
+    private HighscoreContextMock context;
 
     @Before
     public void setUp() {
-        context = new ContextMock(Vertx.vertx());
-        handler = new HighscoreHandler<>(context);
-        context.setMaxCount(3);
+        context = new HighscoreContextMock(new ContextMock());
+        handler = new HighscoreHandler(context);
+        context.settings().setMaxCount(3);
+    }
+
+    @After
+    public void tearDown(TestContext test) {
+        context.close(test.asyncAssertSuccess());
     }
 
     @Test
-    public void testUpdateList(TestContext test) throws CoreException {
+    public void testUpdateList(TestContext test) {
         handle(Constants.ID_UPDATE, (response, status) -> {
             test.assertEquals(ResponseStatus.ACCEPTED, status);
         }, getUpdate(PLAYER_NAME, 50));
@@ -54,7 +56,7 @@ public class HighscoreHandlerTest {
     }
 
     @Test
-    public void testSortOrder(TestContext test) throws CoreException {
+    public void testSortOrder(TestContext test) {
         updateFourTimes();
 
         handle(Constants.ID_LIST, (response, status) -> {
@@ -70,7 +72,7 @@ public class HighscoreHandlerTest {
         });
     }
 
-    private void updateFourTimes() throws CoreException {
+    private void updateFourTimes() {
         for (int i = 0; i < 4; i++) {
             handle(Constants.ID_UPDATE, (response, status) -> {
             }, getUpdate(PLAYER_NAME + i, 10 * i));
@@ -79,12 +81,12 @@ public class HighscoreHandlerTest {
 
     private List<HighscoreEntry> getHighScoreList(JsonObject response) {
         return response.getJsonArray(ID_LIST).stream()
-                .map(entry -> Serializer.<HighscoreEntry>unpack((JsonObject) entry, HighscoreEntry.class))
+                .map(entry -> Serializer.unpack((JsonObject) entry, HighscoreEntry.class))
                 .collect(Collectors.toList());
     }
 
     @Test
-    public void testOldEntriesRemoved(TestContext test) throws CoreException {
+    public void testOldEntriesRemoved(TestContext test) {
         updateFourTimes();
 
         handle(ID_LIST, (response, status) -> {
@@ -93,8 +95,8 @@ public class HighscoreHandlerTest {
     }
 
     @Test
-    public void testChangeLimit(TestContext test) throws CoreException {
-        context.setMaxCount(1);
+    public void testChangeLimit(TestContext test) {
+        context.settings().setMaxCount(1);
         updateFourTimes();
 
         handle(ID_LIST, (response, status) -> {
@@ -102,7 +104,7 @@ public class HighscoreHandlerTest {
         });
     }
 
-    private void handle(String action, ResponseListener listener) throws CoreException {
+    private void handle(String action, ResponseListener listener) {
         handle(action, listener, new JsonObject());
     }
 
@@ -110,7 +112,7 @@ public class HighscoreHandlerTest {
      * ResponseListener provides a callback with the response in json format and the status code.
      * RequestMock.get creates a new mock request.
      */
-    private void handle(String action, ResponseListener listener, JsonObject payload) throws CoreException {
+    private void handle(String action, ResponseListener listener, JsonObject payload) {
         handler.handle(RequestMock.get(action, listener, payload));
     }
 }
