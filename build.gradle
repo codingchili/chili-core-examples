@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
 
-project.version = "1.1.0"
+project.version = "1.2.0"
 project.group = 'com.codingchili.chili-samples'
 
 sourceCompatibility = 1.8
@@ -15,7 +15,13 @@ repositories {
 }
 
 dependencies {
-    compile "com.github.codingchili.chili-core:core:${project.version}"
+    compile("com.github.codingchili.chili-core:core:$project.version") {
+        exclude group: 'org.elasticsearch.client', module: 'elasticsearch-rest-high-level-client'
+        exclude group: 'com.googlecode.cqengine', module: 'cqengine'
+        exclude group: 'io.vertx', module: 'vertx-hazelcast'
+        exclude group: 'io.vertx', module: 'vertx-mongo-client'
+    }
+
     testCompile 'io.vertx:vertx-unit:3.5.1'
     testCompile 'junit:junit:4.12'
 }

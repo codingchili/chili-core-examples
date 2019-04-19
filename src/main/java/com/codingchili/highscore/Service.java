@@ -43,7 +43,7 @@ public class Service implements CoreService {
         // requests are handled by the highscore handler.
         context.listener(() ->
                 new RestListener()
-                        .settings(() -> settings)
+                        .settings(settings)
                         .handler(new HighscoreHandler(context)));
 
         start.complete();
